@@ -1,0 +1,34 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DangEasy.Crud", "DangEasy.Crud\DangEasy.Crud.csproj", "{0F34D377-D076-4F87-9F49-CE52C720267A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Example", "_Example", "{FDAC498A-3C48-4EF6-8721-C76D78232C67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Console", "Example.Console\Example.Console.csproj", "{86925FAE-8263-49ED-8AC3-40B5C9775FDD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DangEasy.Crud.Test", "DangEasy.Crud.Test\DangEasy.Crud.Test.csproj", "{E89D850C-5ED9-4123-9F81-DC0B5BB06E0B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0F34D377-D076-4F87-9F49-CE52C720267A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F34D377-D076-4F87-9F49-CE52C720267A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F34D377-D076-4F87-9F49-CE52C720267A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F34D377-D076-4F87-9F49-CE52C720267A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86925FAE-8263-49ED-8AC3-40B5C9775FDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86925FAE-8263-49ED-8AC3-40B5C9775FDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86925FAE-8263-49ED-8AC3-40B5C9775FDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86925FAE-8263-49ED-8AC3-40B5C9775FDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E89D850C-5ED9-4123-9F81-DC0B5BB06E0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E89D850C-5ED9-4123-9F81-DC0B5BB06E0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E89D850C-5ED9-4123-9F81-DC0B5BB06E0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E89D850C-5ED9-4123-9F81-DC0B5BB06E0B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{86925FAE-8263-49ED-8AC3-40B5C9775FDD} = {FDAC498A-3C48-4EF6-8721-C76D78232C67}
+	EndGlobalSection
+EndGlobal

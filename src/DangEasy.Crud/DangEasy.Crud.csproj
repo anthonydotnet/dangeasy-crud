@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Enums\" />
+    <Folder Include="Interfaces\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="ResultHelper.cs" />
+    <Compile Remove="CrudService %28copy%29.cs" />
+    <Compile Remove="CrudServiceExtended.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DangEasy.Interfaces" Version="0.3.0" />
+  </ItemGroup>
+</Project>
