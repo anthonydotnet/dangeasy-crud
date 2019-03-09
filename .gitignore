@@ -330,3 +330,5 @@ ASALocalRun/
 .mfractor/
 
 *.DS_Store
+src/Example.Console/appsettings.json
+
