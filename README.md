@@ -21,7 +21,7 @@ It's Dang Easy! It just works!
 
 # Installation
 
-Use NuGet to install the [package](https://www.nuget.org/packages/DangEasy.CosmosDB.Repository/).
+Use NuGet to install the [package](https://www.nuget.org/packages/DangEasy.Crud/).
 
 ```
 PM> Install-Package DangEasy.Crud
