@@ -4,7 +4,6 @@ using DangEasy.Crud.Test.Unit.Models;
 using Moq;
 using DangEasy.Interfaces.Database;
 using DangEasy.Crud.Enums;
-using DangEasy.Crud.Results;
 using DangEasy.Crud.ResponseModels;
 
 namespace DangEasy.Crud.Test.Unit

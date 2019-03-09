@@ -4,19 +4,18 @@ using DangEasy.Crud.Test.Unit.Models;
 using Moq;
 using DangEasy.Interfaces.Database;
 using DangEasy.Crud.Enums;
-using DangEasy.Crud.Results;
 using System.Threading.Tasks;
 using DangEasy.Crud.ResponseModels;
 
 namespace DangEasy.Crud.Test.Unit
 {
-    public class When_Posting : BaseTestFixture, IDisposable
+    public class When_Creating : BaseTestFixture, IDisposable
     {
         CrudService<Profile> _service;
         Mock<IRepository<Profile>> _repoMock;
         Profile _responseModel;
 
-        public When_Posting() : base()
+        public When_Creating() : base()
         {
             _repoMock = new Mock<IRepository<Profile>>();
             _service = new CrudService<Profile>(_repoMock.Object);

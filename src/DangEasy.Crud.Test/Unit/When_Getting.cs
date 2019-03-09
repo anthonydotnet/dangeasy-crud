@@ -4,7 +4,6 @@ using DangEasy.Crud.Test.Unit.Models;
 using Moq;
 using DangEasy.Interfaces.Database;
 using DangEasy.Crud.Enums;
-using DangEasy.Crud.Results;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +29,7 @@ namespace DangEasy.Crud.Test.Unit
 
 
         [Fact]
-        public void All_List_Of_Documents_Are_Returned()
+        public void All_Documents_Are_Returned()
         {
             var responseList = new List<Profile>() { _responseModel }.AsQueryable();
             _repoMock.Setup(x => x.GetAllAsync()).Returns(Task.FromResult(responseList));
@@ -72,7 +71,22 @@ namespace DangEasy.Crud.Test.Unit
 
             var response = _service.FirstOrDefaultAsync(sql).Result as FirstOrDefaultResponse<Profile>;
 
-            Assert.Equal(StatusCode.Ok, response.StatusCode);            Assert.Equal(response.Data.Id, _model.Id);
+            Assert.Equal(StatusCode.Ok, response.StatusCode);            Assert.Equal(_model.Id, response.Data.Id);
+        }
+
+
+        [Fact]
+        public void Query_Is_Successful()
+        {
+            const string sql = "SELECT * FROM Profile p WHERE p.FirstName = 'Anthony'";
+            var responseList = new List<Profile>() { _responseModel }.AsQueryable();
+
+            _repoMock.Setup(x => x.QueryAsync(sql)).Returns(Task.FromResult(responseList));
+
+            var response = _service.QueryAsync(sql).Result as QueryResponse<Profile>;
+
+            Assert.Equal(StatusCode.Ok, response.StatusCode);
+            Assert.Equal(_model.Id, response.Data.First().Id);
         }
     }
 }
