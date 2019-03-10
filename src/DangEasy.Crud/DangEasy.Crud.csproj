@@ -2,6 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackOnBuild>true</PackOnBuild>
+    <PackageVersion>0.1.0</PackageVersion>
+    <PackageLicenseUrl>https://github.com/anthonydotnet/dangeasy-crud/blob/master/LICENSE</PackageLicenseUrl>
+    <Owners>Anthony Dang</Owners>
+    <PackageProjectUrl>https://github.com/anthonydotnet/dangeasy-crud</PackageProjectUrl>
+    <Summary>A simple CRUD library for dotnet Standard 2.0.</Summary>
+    <PackageTags>CRUD, Repository, Pattern, Database, CosmosDB</PackageTags>
+    <Title>DangEasy.Crud</Title>
+    <Description>Beta release. A simple CRUD library for dotnet Standard 2.0.</Description>
+    <PackageId>DangEasy.Crud</PackageId>
+    <Authors>Anthony Dang</Authors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,5 +27,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DangEasy.Interfaces" Version="0.3.0" />
+    <PackageReference Include="NuGet.Build.Packaging" Version="0.2.0" />
   </ItemGroup>
 </Project>
