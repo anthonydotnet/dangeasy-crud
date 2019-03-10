@@ -31,11 +31,11 @@ PM> Install-Package DangEasy.Crud
 
 ## Step 1: Instantiate your IRepository
 
-In this example, I am using my CosmosDB repository.
+In this example, I am using my [CosmosDB repository](https://www.nuget.org/packages/DangEasy.CosmosDb.Repository/).
 
 ```csharp
 
-		// instantiate IRepository - In this case I'm using my CosmosDB repository
+		// instantiate IRepository - In this case I'm using my CosmosDB repository 
         DocumentClient documentClient = new DocumentClient(new Uri(endpointUrl), authorizationKey);
         IRepository<Profile> repository = new DocumentDbRepository<Profile>(documentClient, databaseName, collectionName);
 
