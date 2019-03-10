@@ -12,4 +12,5 @@ namespace DangEasy.Crud.Events
         public delegate IUpdateResponse<TEntity> UpdateDelegate<TEntity>(IRepository<TEntity> repository, TEntity entity, out bool exitMethod) where TEntity : class;
 
     }
+
 }

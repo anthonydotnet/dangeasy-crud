@@ -9,6 +9,7 @@ using DangEasy.Crud.Interfaces;
 using DangEasy.Crud.ResponseModels;
 using System.Linq;
 using static DangEasy.Crud.Events.Delegates;
+using DangEasy.Crud.Events;
 
 namespace DangEasy.Crud
 {
@@ -53,6 +54,8 @@ namespace DangEasy.Crud
                     if (doc != null)
                     {
                         //-- Event: Already exists 
+                        eventResult = DomainEvents.Raise(new CreateConflictEvent<TEntity> { Repository = _repository, Entity = poco }) as ICreateResponse<TEntity>;
+
                         eventResult = OnCreate_HasConflict != null ? OnCreate_HasConflict(_repository, poco, out exitMethod) : null;
                         if (exitMethod) { return eventResult; }
 

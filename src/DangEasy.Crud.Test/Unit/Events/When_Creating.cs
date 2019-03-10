@@ -6,6 +6,7 @@ using DangEasy.Interfaces.Database;
 using System.Threading.Tasks;
 using DangEasy.Crud.ResponseModels;
 using DangEasy.Crud.Interfaces;
+using DangEasy.Crud.Events;
 
 namespace DangEasy.Crud.Test.Unit.Events
 {
@@ -35,6 +36,14 @@ namespace DangEasy.Crud.Test.Unit.Events
 
             Assert.NotNull(response as MyCustomResponse<Profile>);
             _repoMock.Verify(x => x.CreateAsync(It.IsAny<Profile>()), Times.Never);
+        }
+
+
+        [Fact]
+        public void DomainEventConflict()
+        {
+            // DomainEvents.Register<CustomerBecamePreferred>();
+            DomainEvents.Register<CustomConflictHandler<Profile>>(p => { });
         }
 
 
@@ -104,6 +113,18 @@ namespace DangEasy.Crud.Test.Unit.Events
         {
             public MyCustomResponse(object id, Profile profile) : base(profile)
             {
+            }
+        }
+
+
+
+        public class CustomConflictHandler<TEntity> : Handles<CreateConflictEvent<TEntity>> where TEntity : class
+        {
+            public ICrudResponse Handle(CreateConflictEvent<TEntity> args)
+            {
+                // do something
+
+                return null;
             }
         }
     }
