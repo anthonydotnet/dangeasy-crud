@@ -1,76 +1,67 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
-using DangEasy.Crud.Interfaces;
-using DangEasy.Interfaces.Database;
+using System.Linq;
 
 namespace DangEasy.Crud.Events
 {
-    //http://udidahan.com/2009/06/14/domain-events-salvation/
+    // http://udidahan.com/2009/06/14/domain-events-salvation/
+    // https://benfoster.io/blog/deferred-domain-events
+    // https://enterprisecraftsmanship.com/2017/10/03/domain-events-simple-and-reliable-solution/
 
     public interface IDomainEvent { }
 
-    public interface Handles<T> where T : IDomainEvent
+    public interface IHandles<TEvent> where TEvent : IDomainEvent
     {
-        ICrudResponse Handle(T args);
+        EventResult Handle(TEvent args);
     }
-
 
     public static class DomainEvents
     {
-        [ThreadStatic] //so that each thread has its own callbacks
-        private static List<Delegate> actions;
-        public static IContainer Container { get; set; } //as before
+        [ThreadStatic]
+        private static List<IHandles<IDomainEvent>> Container;
 
-        //Registers a callback for the given domain event
-        public static void Register<T>(Action<T> callback) where T : IDomainEvent
+        public static void Register<T>(IHandles<IDomainEvent> handler) where T : IDomainEvent
         {
-            if (actions == null)
+            if (Container == null)
             {
-                actions = new List<Delegate>();
+                Container = new List<IHandles<IDomainEvent>>();
             }
 
-            actions.Add(callback);
+            Container.Add(handler);
         }
 
-        //Clears callbacks passed to Register on the current thread
-        public static void ClearCallbacks()
+        public static void Remove(Type type)
         {
-            actions = null;
-        }
-
-        //Raises the given domain event
-        public static ICrudResponse Raise<T>(T args) where T : IDomainEvent
-        {
-            ICrudResponse response = null;
             if (Container != null)
             {
-                foreach (var handler in Container.Components)
-                {
-                    var h = handler as Handles<T>;
-                    response = h.Handle(args);
-                }
+                Container = Container.Where(x => x.GetType() == type).ToList();
             }
-            if (actions != null)
+        }
+
+
+        public static void Clear()
+        {
+            Container = null;
+        }
+
+
+        //Raises the given domain event
+        public static EventResult Raise<TEvent>(TEvent args) where TEvent : IDomainEvent
+        {
+            if (Container != null)
             {
-                foreach (var action in actions)
+                foreach (var handler in Container)
                 {
-                    if (action is Action<T>)
+                    if (handler is TEvent)
                     {
-                        ((Action<T>)action)(args);
+                        return handler.Handle(args);
                     }
                 }
             }
 
-            return response;
+            return new EventResult { ExitMethod = false };
         }
     }
-
-
-    public class CreateConflictEvent<TEntity> : IDomainEvent where TEntity : class
-    {
-        public TEntity Entity { get; set; }
-        public IRepository<TEntity> Repository { get; internal set; }
-    }
-
 }

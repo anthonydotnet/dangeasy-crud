@@ -6,6 +6,7 @@ using DangEasy.Interfaces.Database;
 using DangEasy.Crud.Enums;
 using System.Threading.Tasks;
 using DangEasy.Crud.ResponseModels;
+using DangEasy.Crud.Events;
 
 namespace DangEasy.Crud.Test.Unit
 {
@@ -59,9 +60,10 @@ namespace DangEasy.Crud.Test.Unit
 
             _repoMock.Setup(x => x.GetByIdAsync(_model.Id)).Returns(Task.FromResult(conflictModel));
 
-            var response = _service.CreateAsync(_model).Result as ConflictResponse<Profile>;
+            var response = _service.CreateAsync(_model).Result;
 
             Assert.Equal(StatusCode.Conflict, response.StatusCode);
+            Assert.True(response is ConflictResponse<Profile>);
             _repoMock.Verify(x => x.CreateAsync(It.IsAny<Profile>()), Times.Never);
         }
 

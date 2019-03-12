@@ -22,6 +22,6 @@
     <ProjectReference Include="..\DangEasy.Crud\DangEasy.Crud.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Unit\Events\" />
+    <Folder Include="IntegratedEvents\" />
   </ItemGroup>
 </Project>

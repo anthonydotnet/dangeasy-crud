@@ -8,7 +8,6 @@ using System.Diagnostics;
 using DangEasy.Crud.Interfaces;
 using DangEasy.Crud.ResponseModels;
 using System.Linq;
-using static DangEasy.Crud.Events.Delegates;
 using DangEasy.Crud.Events;
 
 namespace DangEasy.Crud
@@ -17,14 +16,6 @@ namespace DangEasy.Crud
     {
         protected readonly IRepository<TEntity> _repository;
         protected readonly string _repoIdentityProperty;
-
-        public event CreateDelegate<TEntity> OnCreate_MethodStart;
-        public event CreateDelegate<TEntity> OnCreate_HasConflict;
-        public event CreateDelegate<TEntity> OnCreate_NoConflict;
-        public event CreateDelegate<TEntity> OnCreate_Success;
-        public event CreateDelegate<TEntity> OnCreate_Exception;
-
-        public event UpdateDelegate<TEntity> OnUpdate_MethodStart;
 
 
         public CrudService(IRepository<TEntity> repository, Expression<Func<TEntity, object>> idNameFactory = null)
@@ -36,11 +27,9 @@ namespace DangEasy.Crud
 
         public async Task<ICreateResponse<TEntity>> CreateAsync(TEntity poco)
         {
-            bool exitMethod = false;
-
             //-- Event: Method start 
-            var eventResult = OnCreate_MethodStart != null ? OnCreate_MethodStart(_repository, poco, out exitMethod) : null;
-            if (exitMethod) { return eventResult; }
+            var eventResult = DomainEvents.Raise(new CreateStartMethodEvent<TEntity> { Repository = _repository, Entity = poco });
+            if (eventResult.ExitMethod) { return eventResult.CrudResponse as ICreateResponse<TEntity>; }
 
             try
             {
@@ -54,33 +43,30 @@ namespace DangEasy.Crud
                     if (doc != null)
                     {
                         //-- Event: Already exists 
-                        eventResult = DomainEvents.Raise(new CreateConflictEvent<TEntity> { Repository = _repository, Entity = poco }) as ICreateResponse<TEntity>;
 
-                        eventResult = OnCreate_HasConflict != null ? OnCreate_HasConflict(_repository, poco, out exitMethod) : null;
-                        if (exitMethod) { return eventResult; }
 
                         return new ConflictResponse<TEntity>(entityId, poco);
                     }
                 }
 
                 //-- Event: Doc NOT exists, so create! 
-                eventResult = OnCreate_NoConflict != null ? OnCreate_NoConflict(_repository, poco, out exitMethod) : null;
-                if (exitMethod) { return eventResult; }
+                //  eventResult = OnCreate_NoConflict != null ? OnCreate_NoConflict(_repository, poco, out exitMethod) : null;
+                //   if (exitMethod) { return eventResult; }
 
                 var res = await _repository.CreateAsync(poco);
                 var response = new CreateResponse<TEntity>(res);
 
                 //-- Event: Successful execution
-                eventResult = OnCreate_Success != null ? OnCreate_Success(_repository, poco, out exitMethod) : null;
-                if (exitMethod) { return eventResult; }
+                eventResult = DomainEvents.Raise(new CreateSuccessEvent<TEntity> { Repository = _repository, Entity = poco });
+                if (eventResult.ExitMethod) { return eventResult.CrudResponse as CreateResponse<TEntity>; }
 
                 return response;
             }
             catch (Exception ex)
             {
                 //-- Event: Error during create
-                eventResult = OnCreate_Exception != null ? OnCreate_Exception(_repository, poco, out exitMethod) : null;
-                if (exitMethod) { return eventResult; }
+                // eventResult = OnCreate_Exception != null ? OnCreate_Exception(_repository, poco, out exitMethod) : null;
+                // if (exitMethod) { return eventResult; }
 
                 return new CreateErrorResponse<TEntity>(poco, ErrorMessage.Build("Create", poco.ToString()), ex);
             }
@@ -89,11 +75,10 @@ namespace DangEasy.Crud
 
         public async Task<IUpdateResponse<TEntity>> UpdateAsync(TEntity poco)
         {
-            var exitMethod = false;
-
             //-- Event: Method start 
-            var eventResult = OnUpdate_MethodStart != null ? OnUpdate_MethodStart(_repository, poco, out exitMethod) : null;
-            if (exitMethod) { return eventResult; }
+            var eventResult = DomainEvents.Raise(new UpdateStartMethodEvent<TEntity> { Repository = _repository, Entity = poco });
+            if (eventResult.ExitMethod) { return eventResult.CrudResponse as IUpdateResponse<TEntity>; }
+
             try
             {
                 // check for existance!
@@ -113,6 +98,8 @@ namespace DangEasy.Crud
                 var response = new UpdatedResponse<TEntity>(res);
 
                 //-- Event: Successful execution 
+                eventResult = DomainEvents.Raise(new UpdateSuccessEvent<TEntity> { Repository = _repository, Entity = poco });
+                if (eventResult.ExitMethod) { return eventResult.CrudResponse as UpdatedResponse<TEntity>; }
 
                 return response;
             }
@@ -128,6 +115,8 @@ namespace DangEasy.Crud
         public async Task<IDeleteResponse> DeleteAsync(object entityId)
         {
             //-- Event: Method start
+            var eventResult = DomainEvents.Raise(new DeleteStartMethodEvent<TEntity> { Repository = _repository, Id = entityId });
+            if (eventResult.ExitMethod) { return eventResult.CrudResponse as IDeleteResponse; }
 
             try
             {
@@ -147,7 +136,8 @@ namespace DangEasy.Crud
                 if (success)
                 {
                     //-- Event: Successful execution
-
+                    eventResult = DomainEvents.Raise(new DeleteSuccessEvent<TEntity> { Repository = _repository, Id = entityId });
+                    if (eventResult.ExitMethod) { return eventResult.CrudResponse as IDeleteResponse; }
 
                     // No Content means success! Yeah that's strange! 
                     return new DeletedResponse(entityId);
