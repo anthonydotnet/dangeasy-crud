@@ -16,7 +16,7 @@ Features
 It's Dang Easy! It just works!
 
 
-[![Nuget](https://img.shields.io/badge/nuget-0.1.0-blue.svg?maxAge=3600)](https://www.nuget.org/packages/DangEasy.Crud)
+[![Nuget](https://img.shields.io/badge/nuget-0.2.0-blue.svg?maxAge=3600)](https://www.nuget.org/packages/DangEasy.Crud)
 
 
 # Installation

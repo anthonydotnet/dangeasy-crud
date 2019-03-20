@@ -7,21 +7,24 @@ using System;
 using System.Diagnostics;
 using DangEasy.Crud.Interfaces;
 using DangEasy.Crud.ResponseModels;
-using System.Linq;
 using DangEasy.Crud.Events;
+using DangEasy.Crud.Attributes;
+using DangEasy.Crud.Providers;
+using System.Reflection;
 
 namespace DangEasy.Crud
 {
-    public class CrudService<TEntity> where TEntity : class
+    public class CrudService<TEntity> : ICrudService<TEntity> where TEntity : class
     {
         protected readonly IRepository<TEntity> _repository;
         protected readonly string _repoIdentityProperty;
+        protected IDateTimeProvider _dataTimeProvider;
 
-
-        public CrudService(IRepository<TEntity> repository, Expression<Func<TEntity, object>> idNameFactory = null)
+        public CrudService(IRepository<TEntity> repository, Expression<Func<TEntity, object>> idNameFactory = null, IDateTimeProvider dateTimeProvider = null)
         {
             _repository = repository;
             _repoIdentityProperty = ReflectionHelper.TryGetIdProperty(idNameFactory);
+            _dataTimeProvider = dateTimeProvider ?? new DefaultDateTimeProvider();
         }
 
 
@@ -33,8 +36,18 @@ namespace DangEasy.Crud
 
             try
             {
-                var entityId = ReflectionHelper.GetPropertyValue(poco, _repoIdentityProperty);
+                if (ReflectionHelper.GetFirstPropertyWith<TEntity>(typeof(UniqueKeyAttribute)) is PropertyInfo conflictProperty)
+                {
+                    var doc = await _repository.FirstOrDefaultAsync($"SELECT * FROM {typeof(TEntity).Name} p WHERE p.{conflictProperty.GetJsonPropertyName()} = '{conflictProperty.GetValue(poco)}'");
+                    if (doc != null)
+                    {
+                        //-- Event: Already exists 
 
+                        return new ConflictResponse<TEntity>(conflictProperty.GetValue(poco), poco);
+                    }
+                }
+
+                var entityId = ReflectionHelper.GetPropertyValue(poco, _repoIdentityProperty);
                 if (!string.IsNullOrWhiteSpace(entityId as string))
                 {
                     // check for existance first!
@@ -44,23 +57,23 @@ namespace DangEasy.Crud
                     {
                         //-- Event: Already exists 
 
-
                         return new ConflictResponse<TEntity>(entityId, poco);
                     }
                 }
 
                 //-- Event: Doc NOT exists, so create! 
-                //  eventResult = OnCreate_NoConflict != null ? OnCreate_NoConflict(_repository, poco, out exitMethod) : null;
-                //   if (exitMethod) { return eventResult; }
+
+                var datetime = _dataTimeProvider.UtcNow;
+                poco = ReflectionHelper.SetAutoDateProperties(poco, typeof(AutoCreatedDateAttribute), datetime);
+                poco = ReflectionHelper.SetAutoDateProperties(poco, typeof(AutoUpdatedDateAttribute), datetime);
 
                 var res = await _repository.CreateAsync(poco);
-                var response = new CreateResponse<TEntity>(res);
 
                 //-- Event: Successful execution
                 eventResult = DomainEvents.Raise(new CreateSuccessEvent<TEntity> { Repository = _repository, Entity = poco });
                 if (eventResult.ExitMethod) { return eventResult.CrudResponse as CreateResponse<TEntity>; }
 
-                return response;
+                return new CreateResponse<TEntity>(res);
             }
             catch (Exception ex)
             {
@@ -93,15 +106,16 @@ namespace DangEasy.Crud
                 }
 
                 //-- Event: Doc exists - Pre-Update
-                var res = await _repository.UpdateAsync(poco);
 
-                var response = new UpdatedResponse<TEntity>(res);
+                var datetime = _dataTimeProvider.UtcNow;
+                poco = ReflectionHelper.SetAutoDateProperties(poco, typeof(AutoUpdatedDateAttribute), datetime);
+                var res = await _repository.UpdateAsync(poco);
 
                 //-- Event: Successful execution 
                 eventResult = DomainEvents.Raise(new UpdateSuccessEvent<TEntity> { Repository = _repository, Entity = poco });
                 if (eventResult.ExitMethod) { return eventResult.CrudResponse as UpdatedResponse<TEntity>; }
 
-                return response;
+                return new UpdatedResponse<TEntity>(res);
             }
             catch (Exception ex)
             {

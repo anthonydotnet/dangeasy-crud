@@ -11,6 +11,7 @@ using DangEasy.Crud.Test.Unit;
 
 namespace DangEasy.Crud.Test.IntegratedEvents
 {
+    [Collection("NonParallel")]
     public class When_Deleting : BaseTestFixture, IDisposable
     {
         CrudService<Profile> _service;

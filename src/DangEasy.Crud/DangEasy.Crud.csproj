@@ -19,6 +19,8 @@
     <Folder Include="Enums\" />
     <Folder Include="Interfaces\" />
     <Folder Include="Events\" />
+    <Folder Include="Attributes\" />
+    <Folder Include="Providers\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="ResultHelper.cs" />

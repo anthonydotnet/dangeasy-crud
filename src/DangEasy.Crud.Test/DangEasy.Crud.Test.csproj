@@ -23,5 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="IntegratedEvents\" />
+    <Folder Include="Unit\Reflection\" />
+    <Folder Include="Fakes\" />
   </ItemGroup>
 </Project>

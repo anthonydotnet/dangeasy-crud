@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using DangEasy.Crud.Attributes;
 
 namespace DangEasy.Crud.Reflection
 {
@@ -39,6 +41,42 @@ namespace DangEasy.Crud.Reflection
 
             // identity property not found;
             throw new ArgumentException("Unique identity property not found. Create \"id\" property for your entity or use different property name with JsonAttribute with PropertyName set to \"id\"");
+        }
+
+
+        public static PropertyInfo GetFirstPropertyWith<TEntity>(Type attributeType)
+        {
+            Type entityType = typeof(TEntity);
+            var properties = entityType.GetProperties();
+
+            foreach (var prop in properties)
+            {
+                var attributes = prop.GetCustomAttributes(attributeType, true);
+                if (attributes.Any())
+                {
+                    return prop;
+                }
+            }
+
+            return null;
+        }
+
+
+
+        public static TEntity SetAutoDateProperties<TEntity>(TEntity entity, Type autoDateAttributeType, DateTime date)
+        {
+            Type entityType = typeof(TEntity);
+            var properties = entityType.GetProperties();
+
+            foreach (var prop in properties)
+            {
+                var attributes = prop.GetCustomAttributes(autoDateAttributeType, true);
+                if (attributes.Any())
+                {
+                    prop.SetValue(entity, date);
+                }
+            }
+            return entity;
         }
 
 

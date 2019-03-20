@@ -1,3 +1,4 @@
+using DangEasy.Crud.Attributes;
 using Newtonsoft.Json;
 using System;
 
@@ -8,8 +9,9 @@ namespace Example.Console.Models
         [JsonProperty("id")]
         public string Id { get; set; }
 
-        [JsonProperty("accountId")]
-        public string AccountId { get; set; }
+        [UniqueKey("email")]
+        [JsonProperty("email")]
+        public string Email { get; set; }
 
         [JsonProperty("firstName")]
         public string FirstName { get; set; }
@@ -20,9 +22,11 @@ namespace Example.Console.Models
         [JsonProperty("occupation")]
         public string Occupation { get; set; }
 
+        [AutoCreatedDate]
         [JsonProperty("created")]
         public DateTime Created { get; set; }
 
+        [AutoUpdatedDate]
         [JsonProperty("updated")]
         public DateTime Updated { get; set; }
     }
